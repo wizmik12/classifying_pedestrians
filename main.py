@@ -2,6 +2,7 @@ import numpy as np #supporting multi-dimensional arrays and matrices
 import os #read or write a file
 
 import cv2
+from sklearn.metrics import confusion_matrix
 
 from utils import (label_img, label_return, read_data, hog_descriptor, SVM_linear)
 
@@ -51,4 +52,6 @@ test_labels = np.array(test_labels, dtype = np.int32)
 svm.train(hog_train_data, cv2.ml.ROW_SAMPLE, train_labels)
 
 hog_test_data = np.array(hog_test_data, dtype = np.float32)
-predicted = svm.predict(hog_test_data[0])
+predicted = svm.predict(hog_test_data)[1]
+
+confusion_matrix(test_labels, predicted)

@@ -29,6 +29,7 @@ def read_data(dir, CATEGORIES):
 
 
 def hog_descriptor(data):
+    """
     winSize = (64,128)
     blockSize = (16,16)
     blockStride = (8,8)
@@ -47,13 +48,11 @@ def hog_descriptor(data):
     winStride = (8,8)
     padding = (8,8)
     locations = ((10,20),)
+    """
+    hog = cv2.HOGDescriptor()
     for i in range(len(data)):
-        """
-        data[i].shape
-        data[i].type
-        """
-        data[i] = hog.compute(data[i][0].astype('uint8'),winStride,padding,locations)
-        
+        #data[i] = hog.compute(data[i].astype('uint8'),winStride,padding,locations)
+        data[i] = hog.compute(data[i].astype('uint8'))
     return data
 
 class StatModel(object):
