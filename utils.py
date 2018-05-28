@@ -56,3 +56,11 @@ def hog_descriptor(data):
         data[i] = hog.compute(data[i].astype('uint8'))
     return data
 
+
+def LBP(data):
+    for i in range(len(data)):
+        data[i] = LBP_img(data[i])
+    return data
+
+def LBP_img(img):
+    
