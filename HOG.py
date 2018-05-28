@@ -3,8 +3,10 @@ import os #read or write a file
 
 import cv2
 from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.model_selection import KFold
 
-from utils import (label_img, label_return, read_data, hog_descriptor, SVM_linear)
+
+from utils import (label_img, label_return, read_data, hog_descriptor)
 
 
 
@@ -27,8 +29,6 @@ hog_test_data = hog_descriptor(test_data.copy())
 
 
 #Clasificamos con HOG
-clf = SVM_linear()
-
 svm = cv2.ml.SVM_create()
 svm.setType(cv2.ml.SVM_C_SVC)
 svm.setKernel(cv2.ml.SVM_LINEAR)
@@ -56,3 +56,30 @@ predicted = svm.predict(hog_test_data)[1]
 
 conf_mat = confusion_matrix(test_labels, predicted)
 precision = accuracy_score(test_labels, predicted)
+
+dataset = np.concatenate((hog_train_data, hog_test_data))
+labels = np.concatenate((train_labels, test_labels))
+
+
+
+kf = KFold(n_splits=10)
+precision_list = []
+for train, test in kf.split(dataset):
+    svm = cv2.ml.SVM_create()
+    svm.setType(cv2.ml.SVM_C_SVC)
+    svm.setKernel(cv2.ml.SVM_LINEAR)
+    # svm.setDegree(0.0)
+    # svm.setGamma(0.0)
+    # svm.setCoef0(0.0)
+    # svm.setC(0)
+    # svm.setNu(0.0)
+    # svm.setP(0.0)
+    # svm.setClassWeights(None)
+    svm.setTermCriteria((cv2.TERM_CRITERIA_COUNT, 100, 1.e-06))
+    svm.train(dataset[train], cv2.ml.ROW_SAMPLE, labels[train])
+    predicted = svm.predict(dataset[test])[1]
+    precision = accuracy_score(labels[test], predicted)
+    precision_list.append(precision)
+precision_cv_linear = np.mean(precision)
+
+
