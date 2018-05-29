@@ -6,6 +6,7 @@ import numpy as np #supporting multi-dimensional arrays and matrices
 from sklearn.model_selection import KFold
 
 
+
 #Funcion para etiquetar las imagenes
 def label_img(word_label):                       
     if word_label == 'background': return 1.
@@ -64,8 +65,24 @@ def LBP(data):
 
 def LBP_img(img):
     size1, size2 = img.shape
-    for i in range(1,size1):
-        for j in range(1,size2):
+    numbers = []
+    for i in range(1,size1-1):
+        for j in range(1,size2-1):
             hood = img[i-1 : i+2,j-1:j+2]
-            hood = np.concatenate((hood[0], [hood[2,1], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
+            ordered_hood = np.concatenate((hood[0], [hood[2,1], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
+            for k in range(len(ordered_hood)):
+                if ordered_hood[k] < hood [1,1]:
+                    ordered_hood[k] = 0
+                else:
+                    ordered_hood[k] = 1
             
+            binary = ""
+            for digit in ordered_hood:
+                binary += str(digit)
+            integer = int(binary, 2)
+            numbers.append(integer)
+    
+    hist = np.zeros(256)
+    for l in numbers:
+        hist[l] += 1
+    return hist
