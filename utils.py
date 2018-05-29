@@ -63,4 +63,9 @@ def LBP(data):
     return data
 
 def LBP_img(img):
-    
+    size1, size2 = img.shape
+    for i in range(1,size1):
+        for j in range(1,size2):
+            hood = img[i-1 : i+2,j-1:j+2]
+            hood = np.concatenate((hood[0], [hood[2,1], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
+            
