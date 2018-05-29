@@ -59,9 +59,8 @@ def hog_descriptor(data):
 
 
 def LBP(data):
-    for i in range(len(data)):
-        data[i] = LBP_img(data[i])
-    return data
+        data_lbp = [LBP_img(img) for img in data]
+        return data_lbp
 
 def LBP_img(img):
     size1, size2 = img.shape
