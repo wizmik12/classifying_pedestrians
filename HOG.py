@@ -83,7 +83,7 @@ for train, test in kf.split(dataset):
     predicted = svm.predict(dataset[test])[1]
     precision = accuracy_score(labels[test], predicted)
     precision_list.append(precision)
-precision_cv_linear = np.mean(precision)
+precision_cv_linear = np.mean(precision_list)
 
 
 #Cross Validation RBF kernel
@@ -108,7 +108,7 @@ for i in [0.1, 0.4, 0.7, 1]:
         predicted = svm.predict(dataset[test])[1]
         precision = accuracy_score(labels[test], predicted)
         precision_list.append(precision)
-    precision_cv_rbf = np.mean(precision)
+    precision_cv_rbf = np.mean(precision_list)
     rbf.append([i, precision_cv_rbf])
 
 
@@ -134,5 +134,5 @@ for i in [2, 3, 4]:
         predicted = svm.predict(dataset[test])[1]
         precision = accuracy_score(labels[test], predicted)
         precision_list.append(precision)
-    precision_cv_poly = np.mean(precision)
+    precision_cv_poly = np.mean(precision_list)
     poly.append([i, precision_cv_poly])
