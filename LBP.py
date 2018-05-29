@@ -113,7 +113,6 @@ for i in [0.1, 0.4, 0.7, 1]:
     rbf.append([i, precision_cv_rbf])
 
 
-
 #Cross Validation Polynomial kernel
 poly = []
 for i in [2, 3, 4]:

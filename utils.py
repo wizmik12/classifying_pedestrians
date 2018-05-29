@@ -6,7 +6,6 @@ import numpy as np #supporting multi-dimensional arrays and matrices
 from sklearn.model_selection import KFold
 
 
-
 #Funcion para etiquetar las imagenes
 def label_img(word_label):                       
     if word_label == 'background': return 1.
