@@ -6,7 +6,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.model_selection import KFold
 
 
-from utils import (read_data, hog_descriptor, LBP)
+from utils import (read_data, LBP)
 
 
 
