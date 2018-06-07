@@ -58,7 +58,11 @@ def hog_descriptor(data):
 
 
 def LBP(data):
-        data_lbp = [LBP_img_basic(img) for img in data]
+        #data_lbp = [LBP_img_basic(img) for img in data]
+        data_lbp = data.copy()
+        for i in range(len(data)):
+            data_lbp[i] = LBP_img_basic(data[i])
+            print(i)
         return data_lbp
 
 """
@@ -90,17 +94,17 @@ def LBP_img_basic(img):
 def LBP_img_basic(img):
     size1, size2 = img.shape
     numbers = []
-    despl_x = 8
-    despl_y = 8
-    celda_x = 16
-    celda_y = 16
+    dx = 8
+    dy = 8
+    cell_x = 16
+    cell_y = 16
     x = 0
     y = 0
     
     hist_list = []
-    while  y + celda_y < size1:
-        for i in range(x, x + celda_x + 1):
-            for j in range(y, y + celda_y + 1):
+    while  y + cell_y < size1:
+        for i in range(x, x + cell_x + 1):
+            for j in range(y, y + cell_y + 1):
                 
                 if i == 0:
                     hood = img[i : i+2,j-1:j+2]
@@ -147,11 +151,11 @@ def LBP_img_basic(img):
             hist[l] += 1
         hist_list.append(hist)
         
-        if x + despl_x + celda_x > size2:
+        if x + dx + cell_x > size2:
             x = 0
-            y = y + despl_y
+            y = y + dy
         else:
-            x = x + despl_x
+            x = x + dx
             
     return hist_list
 """
@@ -159,54 +163,21 @@ def LBP_img_basic(img):
 
 def LBP_img_basic(img):
     size2, size1 = img.shape
+    img_pad = np.zeros((size2 + 2, size1 + 2), dtype = 'int')
+    img_pad[1:size2+1, 1:size1+1] = img
     numbers = []
-    despl_x = 8
-    despl_y = 8
-    celda_x = 16
-    celda_y = 16
-    x = 0
-    y = 0
+    dx = 8
+    dy = 8
+    cell_x = 16
+    cell_y = 16
+    x = 1
+    y = 1
     
     hist_list = []
-    while  y + celda_y  <= size2:
-        for i in range(y, y + celda_y):
-            for j in range(x, x + celda_x):
-                
-                hood = np.zeros((3,3), dtype = int)
-                
-                if j == 0 and i == 0:
-                    hood[1:3, 1:3] = img[i:i+2, j:j+2]
-                 
-                elif i == 0 and j == size1 - 1:
-                    hood[1:3, 0:2] = img[i:i+2, j-1:j+1]
-                    
-                elif j == 0 and i == size2 - 1:
-                    hood[0:2, 1:3] = img[i-1:i+1, j:j+2]
-                    
-                elif i == size2 - 1 and j == size1 - 1:
-                    hood[0:2, 0:2] = img[i-1 : i+1, j-1:j+1]
-                    
-                elif i == 0:
-                    hood[1:3,0:3] = img[i:i+2, j-1:j+2]
-                            
-                elif j == 0:
-                    hood[0:3, 1:3] = img[i-1:i+2, j:j+2]
-                                      
-                
-                    
-                elif i == size2 - 1:
-                    hood[0:2, 0:3] = img[i-1 : i+1, j-1:j+2]
-                    
-                    
-                elif j == size1 - 1:
-                    hood[0:3, 0:2] = img[i-1 : i+2, j-1:j+1]
-                    
-                else:
-                    hood = img[i-1 : i+2, j-1:j+2]
-                    
-                
-                
-                print(j,i,x,y)
+    while  y + cell_y  <= size2+1:
+        for i in range(y, y + cell_y):
+            for j in range(x, x + cell_x):
+                hood = img_pad[i-1 : i+2, j-1:j+2]
                 ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
                     
                 for k in range(len(ordered_hood)):
@@ -220,17 +191,18 @@ def LBP_img_basic(img):
                     binary += str(digit)
                 integer = int(binary, 2)
                 numbers.append(integer)
+                
         
         hist = np.zeros(256)
         for l in numbers:
             hist[l] += 1
         hist_list = np.concatenate((hist_list, hist))
         
-        if x + despl_x + celda_x > size1:
-            x = 0
-            y = y + despl_y
+        if x + dx + cell_x > size1+1:
+            x = 1
+            y = y + dy
         else:
-            x = x + despl_x
+            x = x + dx
     return hist_list
 
 
@@ -283,4 +255,81 @@ for n=0:nwin_y-1
         H((cont-1)*B+1:cont*B,1)=H2;
     end
 end
+"""
+
+"""
+
+def LBP_img_basic(img):
+    size2, size1 = img.shape
+    numbers = []
+    dx = 8
+    dy = 8
+    cell_x = 16
+    cell_y = 16
+    x = 0
+    y = 0
+    
+    hist_list = []
+    while  y + cell_y  <= size2:
+        a = range(y, y + cell_y)
+        b = range(x, x + cell_x)
+        aa, bb = np.meshgrid(a,b)
+        for i in range(y, y + cell_y):
+            for j in range(x, x + cell_x):
+                
+                hood = np.zeros((3,3), dtype = int)
+                
+                if j == 0 and i == 0:
+                    hood[1:3, 1:3] = img[i:i+2, j:j+2]
+                 
+                elif i == 0 and j == size1 - 1:
+                    hood[1:3, 0:2] = img[i:i+2, j-1:j+1]
+                    
+                elif j == 0 and i == size2 - 1:
+                    hood[0:2, 1:3] = img[i-1:i+1, j:j+2]
+                    
+                elif i == size2 - 1 and j == size1 - 1:
+                    hood[0:2, 0:2] = img[i-1 : i+1, j-1:j+1]
+                    
+                elif i == 0:
+                    hood[1:3,0:3] = img[i:i+2, j-1:j+2]
+                            
+                elif j == 0:
+                    hood[0:3, 1:3] = img[i-1:i+2, j:j+2]
+                                      
+                elif i == size2 - 1:
+                    hood[0:2, 0:3] = img[i-1 : i+1, j-1:j+2]      
+                    
+                elif j == size1 - 1:
+                    hood[0:3, 0:2] = img[i-1 : i+2, j-1:j+1]
+                    
+                else:
+                    hood = img[i-1 : i+2, j-1:j+2]
+                    
+                ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
+                    
+                for k in range(len(ordered_hood)):
+                    if ordered_hood[k] < hood [1,1]:
+                        ordered_hood[k] = 0
+                    else:
+                        ordered_hood[k] = 1
+                
+                binary = ""
+                for digit in ordered_hood:
+                    binary += str(digit)
+                integer = int(binary, 2)
+                numbers.append(integer)
+        
+        hist = np.zeros(256)
+        for l in numbers:
+            hist[l] += 1
+        hist_list = np.concatenate((hist_list, hist))
+        
+        if x + dx + cell_x > size1:
+            x = 0
+            y = y + dy
+        else:
+            x = x + dx
+    return hist_list
+    
 """
