@@ -11,7 +11,7 @@ from utils import (read_data, LBP)
 
 
 #Paths
-data_dir = 'D://Master//ECI//Practica//Practica1//data'
+data_dir = 'D://Master//ECI//Practica//Practica_Caracteristicas//data'
 train_dir = os.path.join(data_dir, 'train')
 test_dir = os.path.join(data_dir, 'test')
 

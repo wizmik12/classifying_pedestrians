@@ -4,6 +4,7 @@ import os #read or write a file
 import cv2  
 import numpy as np #supporting multi-dimensional arrays and matrices
 from sklearn.model_selection import KFold
+from itertools import product
 
 
 #Funcion para etiquetar las imagenes
@@ -65,107 +66,14 @@ def LBP(data):
             print(i)
         return data_lbp
 
-"""
-def LBP_img_basic(img):
-    size1, size2 = img.shape
-    numbers = []
-    for i in range(1,size1-1):
-        for j in range(1,size2-1):
-            hood = img[i-1 : i+2,j-1:j+2]
-            ordered_hood = np.concatenate((hood[0], [hood[2,1], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-            for k in range(len(ordered_hood)):
-                if ordered_hood[k] < hood [1,1]:
-                    ordered_hood[k] = 0
-                else:
-                    ordered_hood[k] = 1
-            
-            binary = ""
-            for digit in ordered_hood:
-                binary += str(digit)
-            integer = int(binary, 2)
-            numbers.append(integer)
-    
-    hist = np.zeros(256)
-    for l in numbers:
-        hist[l] += 1
-    return hist
-"""
-"""
-def LBP_img_basic(img):
-    size1, size2 = img.shape
-    numbers = []
-    dx = 8
-    dy = 8
-    cell_x = 16
-    cell_y = 16
-    x = 0
-    y = 0
-    
-    hist_list = []
-    while  y + cell_y < size1:
-        for i in range(x, x + cell_x + 1):
-            for j in range(y, y + cell_y + 1):
-                
-                if i == 0:
-                    hood = img[i : i+2,j-1:j+2]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1]]))
-                    
-                elif j == 0:
-                    hood = img[i-1 : i+2,j:j+2]
-                    ordered_hood = np.concatenate(([hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                elif j == 0 and i == 0:
-                    hood = img[i : i+2,j:j+2]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                elif i == size2:
-                    hood = img[i : i+1,j:j+2]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                elif j == size1:
-                    hood = img[i : i+2, j:j+1]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-               elif i == size2 and j == size1:
-                    hood = img[i : i+1,j:j+1]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                else:
-                    hood = img[i-1 : i+2,j-1:j+2]
-                    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                for k in range(len(ordered_hood)):
-                    if ordered_hood[k] < hood [1,1]:
-                        ordered_hood[k] = 0
-                    else:
-                        ordered_hood[k] = 1
-                
-                binary = ""
-                for digit in ordered_hood:
-                    binary += str(digit)
-                integer = int(binary, 2)
-                numbers.append(integer)
-        
-        hist = np.zeros(256)
-        for l in numbers:
-            hist[l] += 1
-        hist_list.append(hist)
-        
-        if x + dx + cell_x > size2:
-            x = 0
-            y = y + dy
-        else:
-            x = x + dx
-            
-    return hist_list
-"""
+
 
 
 def LBP_img_basic(img):
     size2, size1 = img.shape
     img_pad = np.zeros((size2 + 2, size1 + 2), dtype = 'int')
     img_pad[1:size2+1, 1:size1+1] = img
-    numbers = []
+    
     dx = 8
     dy = 8
     cell_x = 16
@@ -175,26 +83,12 @@ def LBP_img_basic(img):
     
     hist_list = []
     while  y + cell_y  <= size2+1:
-        for i in range(y, y + cell_y):
-            for j in range(x, x + cell_x):
-                hood = img_pad[i-1 : i+2, j-1:j+2]
-                ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
-                    
-                for k in range(len(ordered_hood)):
-                    if ordered_hood[k] < hood [1,1]:
-                        ordered_hood[k] = 0
-                    else:
-                        ordered_hood[k] = 1
-                
-                binary = ""
-                for digit in ordered_hood:
-                    binary += str(digit)
-                integer = int(binary, 2)
-                numbers.append(integer)
-                
+        range_x = range(x, x + cell_x)
+        range_y = range(y, y + cell_y)
+        numbers_lbp = [lbp(i,j, img_pad) for i,j in product(range_y, range_x)]
         
         hist = np.zeros(256)
-        for l in numbers:
+        for l in numbers_lbp:
             hist[l] += 1
         hist_list = np.concatenate((hist_list, hist))
         
@@ -205,6 +99,15 @@ def LBP_img_basic(img):
             x = x + dx
     return hist_list
 
+def lbp(i, j, img):
+    hood = img[i-1 : i+2, j-1:j+2]
+    ordered_hood = np.concatenate((hood[0], [hood[1,2], hood[2,2], hood[2,1], hood[2,0], hood[1,0]]))
+    ordered_hood_comparison = [0  if k < hood[1,1] else 1 for k in ordered_hood]
+    binary = ""
+    for digit in ordered_hood_comparison:
+        binary += str(digit)
+    integer = int(binary, 2)
+    return integer
 
 """
 %Función para calcular el histograma de orientaciones del gradiente
