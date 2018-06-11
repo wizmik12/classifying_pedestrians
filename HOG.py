@@ -11,7 +11,7 @@ from utils import (read_data, hog_descriptor)
 
 
 #Paths
-data_dir = 'D://Master//ECI//Practica//Practica1//data'
+data_dir = 'D://Master//ECI//Practica//Practica_Caracteristicas//data'
 train_dir = os.path.join(data_dir, 'train')
 test_dir = os.path.join(data_dir, 'test')
 
@@ -58,6 +58,7 @@ predicted = svm.predict(hog_test_data)[1]
 #Confusion matrix and precision on test
 conf_mat = confusion_matrix(test_labels, predicted)
 precision_test = accuracy_score(test_labels, predicted)
+print(precision_test)
 
 #Joining train and test
 dataset = np.concatenate((hog_train_data, hog_test_data))
@@ -84,11 +85,12 @@ for train, test in kf.split(dataset):
     precision = accuracy_score(labels[test], predicted)
     precision_list.append(precision)
 precision_cv_linear = np.mean(precision_list)
+print(precision_cv_linear)
 
 
 #Cross Validation RBF kernel
 rbf = []
-for i in [0.1, 0.4, 0.7, 1]:
+for i in [0.001, 0.01, 0.1, 0.4, 0.7, 1, 2]:
     
     kf = KFold(n_splits=10)
     precision_list = []
@@ -97,7 +99,7 @@ for i in [0.1, 0.4, 0.7, 1]:
         svm.setType(cv2.ml.SVM_C_SVC)
         svm.setKernel(cv2.ml.SVM_RBF)
         # svm.setDegree(0.0)
-        svm.setGamma(0.1)
+        svm.setGamma(i)
         # svm.setCoef0(0.0)
         # svm.setC(0)
         # svm.setNu(0.0)
@@ -110,6 +112,7 @@ for i in [0.1, 0.4, 0.7, 1]:
         precision_list.append(precision)
     precision_cv_rbf = np.mean(precision_list)
     rbf.append([i, precision_cv_rbf])
+    print(i,rbf)
 
 
 
@@ -122,7 +125,7 @@ for i in [2, 3, 4]:
         svm = cv2.ml.SVM_create()
         svm.setType(cv2.ml.SVM_C_SVC)
         svm.setKernel(cv2.ml.SVM_POLY)
-        svm.setDegree(2)
+        svm.setDegree(i)
         svm.setGamma(1)
         svm.setCoef0(1)
         # svm.setC(0)
@@ -136,3 +139,4 @@ for i in [2, 3, 4]:
         precision_list.append(precision)
     precision_cv_poly = np.mean(precision_list)
     poly.append([i, precision_cv_poly])
+    print(i, poly)
